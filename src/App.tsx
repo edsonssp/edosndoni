@@ -280,6 +280,17 @@ export default function App() {
     }
   };
 
+  const fetchSettings = async () => {
+    try {
+      const res = await axios.get('/api/settings');
+      if (res.data && Object.keys(res.data).length > 0) {
+        setSettings(res.data);
+      }
+    } catch (err) {
+      console.error("Error fetching settings:", err);
+    }
+  };
+
   useEffect(() => {
     let isMounted = true;
     let intervalId: NodeJS.Timeout;
@@ -287,6 +298,7 @@ export default function App() {
     const load = async () => {
       if (!isMounted) return;
       await fetchProducts();
+      await fetchSettings();
       if (isAdminLoggedIn) {
         await fetchOrders();
       }
@@ -296,6 +308,7 @@ export default function App() {
     // Auto-refresh data to keep the store front and admin panel synced
     intervalId = setInterval(() => {
       fetchProducts();
+      fetchSettings();
       if (isAdminLoggedIn) fetchOrders();
     }, 30000); // Every 30 seconds
 
@@ -429,7 +442,7 @@ export default function App() {
     verdes: ['Banana', 'Beijinho cremoso', 'Cobertura de Chocolate', 'Cobertura de Morango', 'Granola', 'Leite condensado', 'Leite em Pó']
   };
 
-  const paidAddons = [
+  const defaultPaidAddons = [
     { name: 'Creme de ninho', price: 5.20 },
     { name: 'Creme de Pistache', price: 5.78 },
     { name: 'Kinder Bueno', price: 6.36 },
@@ -437,6 +450,10 @@ export default function App() {
     { name: 'Kit Kat', price: 5.78 },
     { name: 'Nutella', price: 5.78 }
   ];
+
+  const paidAddons = (settings?.paidAddons && settings.paidAddons.length > 0)
+    ? settings.paidAddons
+    : defaultPaidAddons;
 
   const milkshakeSizes = [
     { id: '500', label: '500ml', price: settings?.milkshake?.['500'] || 28.90 },
@@ -1275,6 +1292,57 @@ export default function App() {
                                 />
                              </div>
                            ))}
+                        </div>
+
+                        <h3 className="font-bold text-stone-800 mb-6 mt-8">Adicionais Pagos (Açaí)</h3>
+                        <div className="space-y-3">
+                          {(settings?.paidAddons || defaultPaidAddons).map((addon: {name: string, price: number}, idx: number) => (
+                            <div key={idx} className="flex items-center gap-3">
+                              <input 
+                                type="text"
+                                className="flex-1 p-3 bg-stone-50 rounded-xl outline-none font-medium"
+                                value={addon.name}
+                                onChange={e => {
+                                  const updated = [...(settings?.paidAddons || defaultPaidAddons)];
+                                  updated[idx] = { ...updated[idx], name: e.target.value };
+                                  setSettings({...settings, paidAddons: updated});
+                                }}
+                              />
+                              <div className="flex items-center gap-1">
+                                <span className="text-stone-400 text-sm font-bold">R$</span>
+                                <input 
+                                  type="number"
+                                  step="0.01"
+                                  className="w-24 p-3 bg-stone-50 rounded-xl outline-none font-bold"
+                                  value={addon.price}
+                                  onChange={e => {
+                                    const updated = [...(settings?.paidAddons || defaultPaidAddons)];
+                                    updated[idx] = { ...updated[idx], price: parseFloat(e.target.value) || 0 };
+                                    setSettings({...settings, paidAddons: updated});
+                                  }}
+                                />
+                              </div>
+                              <button
+                                onClick={() => {
+                                  const updated = [...(settings?.paidAddons || defaultPaidAddons)];
+                                  updated.splice(idx, 1);
+                                  setSettings({...settings, paidAddons: updated});
+                                }}
+                                className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          ))}
+                          <button
+                            onClick={() => {
+                              const updated = [...(settings?.paidAddons || defaultPaidAddons), { name: 'Novo Adicional', price: 5.00 }];
+                              setSettings({...settings, paidAddons: updated});
+                            }}
+                            className="w-full p-3 border-2 border-dashed border-stone-200 rounded-xl text-stone-400 font-bold text-sm hover:border-amarena-red hover:text-amarena-red transition-all"
+                          >
+                            + Adicionar Novo
+                          </button>
                         </div>
                         <button 
                           onClick={async () => {
