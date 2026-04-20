@@ -199,7 +199,12 @@ async function startServer() {
     try {
       const db = await getDb();
       const settings = await db.collection("settings").findOne({ _id: new ObjectId("000000000000000000000001") });
-      res.json(settings || {});
+      if (settings) {
+        const { _id, ...rest } = settings;
+        res.json(rest);
+      } else {
+        res.json({});
+      }
     } catch (err: unknown) {
       res.status(500).json({ error: String(err) });
     }
@@ -208,16 +213,17 @@ async function startServer() {
   app.put("/api/settings", authenticateAdmin, async (req, res) => {
     try {
       const db = await getDb();
+      const { _id, ...data } = req.body;
       await db.collection("settings").updateOne(
         { _id: new ObjectId("000000000000000000000001") },
-        { $set: req.body },
+        { $set: data },
         { upsert: true }
       );
       res.json({ message: "Configurações salvas" });
     } catch (err: unknown) {
       res.status(500).json({ error: String(err) });
     }
-    });
+  });
 
   // Mercado Pago
   app.post("/api/payment/create-preference", async (req, res) => {
