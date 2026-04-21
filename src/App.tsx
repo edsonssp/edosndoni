@@ -444,12 +444,12 @@ export default function App() {
   };
 
   const defaultPaidAddons = [
-    { name: 'Creme de ninho', price: 5.20 },
-    { name: 'Creme de Pistache', price: 5.78 },
-    { name: 'Kinder Bueno', price: 6.36 },
-    { name: 'Creme de Valsa', price: 5.20 },
-    { name: 'Kit Kat', price: 5.78 },
-    { name: 'Nutella', price: 5.78 }
+    { name: 'Creme de ninho', price: 4.50 },
+    { name: 'Creme de Pistache', price: 5.00 },
+    { name: 'Kinder Bueno', price: 5.50 },
+    { name: 'Creme de Valsa', price: 4.50 },
+    { name: 'Kit Kat', price: 5.00 },
+    { name: 'Nutella', price: 5.00 }
   ];
 
   const paidAddons = (settings?.paidAddons && settings.paidAddons.length > 0)
