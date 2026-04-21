@@ -174,20 +174,12 @@ const OrderTicket = ({ order }: { order: Order | null }) => {
 
 // --- App ---
 
-type AppSettings = {
-  acai?: Record<string, number>;
-  milkshake?: Record<string, number>;
-  sundae?: Record<string, number>;
-  acaiAddons?: string[];
-  milkshakeAddons?: string[];
-  sundaeAddons?: string[];
-};
-
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<'home' | 'sorvete' | 'picole' | 'potes' | 'acai' | 'promos' | 'milkshake' | 'whatsapp' | 'admin' | 'checkout' | 'success'>('home');
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [settings, setSettings] = useState<AppSettings | null>(null);
+  const [settings, setSettings] = useState<any>(null);
+  const [editingSettings, setEditingSettings] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [adminSection, setAdminSection] = useState<'dashboard' | 'products' | 'orders' | 'addons' | 'settings'>('dashboard');
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(!!localStorage.getItem('amarena_admin_token'));
@@ -292,7 +284,9 @@ export default function App() {
   const fetchSettings = async () => {
     try {
       const res = await axios.get('/api/settings');
-      setSettings(res.data);
+      if (res.data && Object.keys(res.data).length > 0) {
+        setSettings(res.data);
+      }
     } catch (err) {
       console.error("Error fetching settings:", err);
     }
@@ -300,6 +294,7 @@ export default function App() {
 
   useEffect(() => {
     let isMounted = true;
+    let intervalId: NodeJS.Timeout;
 
     const load = async () => {
       if (!isMounted) return;
@@ -312,8 +307,9 @@ export default function App() {
     load();
 
     // Auto-refresh data to keep the store front and admin panel synced
-    const intervalId = setInterval(() => {
+    intervalId = setInterval(() => {
       fetchProducts();
+      fetchSettings();
       if (isAdminLoggedIn) fetchOrders();
     }, 30000); // Every 30 seconds
 
@@ -367,9 +363,9 @@ export default function App() {
       } else {
         throw new Error(`Erro do servidor: ${response.status}`);
       }
-    } catch (err: unknown) {
+    } catch (err: any) {
       console.error(err);
-      const errorMessage = (err instanceof Error) ? err.message : "Erro desconhecido ao salvar produto.";
+      const errorMessage = err.response?.data?.message || err.message || "Erro desconhecido ao salvar produto.";
       alert(`Erro ao salvar produto: ${errorMessage}`);
     } finally {
       setLoading(false);
@@ -447,34 +443,28 @@ export default function App() {
     verdes: ['Banana', 'Beijinho cremoso', 'Cobertura de Chocolate', 'Cobertura de Morango', 'Granola', 'Leite condensado', 'Leite em Pó']
   };
 
-<<<<<<< Updated upstream
   const defaultPaidAddons = [
-    { name: 'Creme de ninho', price: 4.50 },
-    { name: 'Creme de Pistache', price: 5.00 },
-    { name: 'Kinder Bueno', price: 5.50 },
-    { name: 'Creme de Valsa', price: 4.50 },
-    { name: 'Kit Kat', price: 5.00 },
-    { name: 'Nutella', price: 5.00 }
-=======
-  const paidAddons = [
     { name: 'Creme de ninho', price: 5.20 },
     { name: 'Creme de Pistache', price: 5.78 },
     { name: 'Kinder Bueno', price: 6.36 },
     { name: 'Creme de Valsa', price: 5.20 },
     { name: 'Kit Kat', price: 5.78 },
     { name: 'Nutella', price: 5.78 }
->>>>>>> Stashed changes
   ];
 
+  const paidAddons = (settings?.paidAddons && settings.paidAddons.length > 0)
+    ? settings.paidAddons
+    : defaultPaidAddons;
+
   const milkshakeSizes = [
-    { id: '300', label: '300ml', price: settings?.milkshake?.['300'] || 20.90 },
-    { id: '400', label: '400ml', price: settings?.milkshake?.['400'] || 25.90 },
     { id: '500', label: '500ml', price: settings?.milkshake?.['500'] || 28.90 },
+    { id: '700', label: '700ml', price: settings?.milkshake?.['700'] || 35.90 },
   ];
 
   const sundaeSizes = [
+    { id: '300', label: '300ml', price: settings?.sundae?.['300'] || 15.90 },
+    { id: '400', label: '400ml', price: settings?.sundae?.['400'] || 19.90 },
     { id: '500', label: '500ml', price: settings?.sundae?.['500'] || 24.90 },
-    { id: '700', label: '700ml', price: settings?.sundae?.['700'] || 35.90 },
   ];
 
   const milkshakeOptions = [
@@ -1125,7 +1115,7 @@ export default function App() {
                   <span className="font-semibold">Adicionais</span>
                 </button>
                 <button 
-                  onClick={() => setAdminSection('settings')}
+                  onClick={() => { setAdminSection('settings'); setEditingSettings(JSON.parse(JSON.stringify(settings || {}))); }}
                   className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${adminSection === 'settings' ? 'bg-amarena-red text-white shadow-md shadow-amarena-red/20' : 'text-stone-500 hover:bg-stone-50'}`}
                 >
                   <Sliders size={20} />
@@ -1267,9 +1257,10 @@ export default function App() {
                                 <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">{id}ml / {id === 'M500' ? 'M' : id === 'G800' ? 'G' : ''}</label>
                                 <input 
                                   type="number"
+                                  step="0.01"
                                   className="w-full p-3 bg-stone-50 rounded-xl outline-none"
-                                  value={settings?.acai?.[id] || ''}
-                                  onChange={e => setSettings({...settings, acai: {...settings?.acai, [id]: parseFloat(e.target.value)}})}
+                                  value={editingSettings?.acai?.[id] ?? ''}
+                                  onChange={e => setEditingSettings((prev: any) => ({...prev, acai: {...prev?.acai, [id]: parseFloat(e.target.value) || 0}}))}
                                 />
                              </div>
                            ))}
@@ -1277,14 +1268,15 @@ export default function App() {
 
                         <h3 className="font-bold text-stone-800 mb-6 mt-8">Preços de Milkshake</h3>
                          <div className="grid grid-cols-2 gap-4">
-                           {['300', '400', '500'].map(id => (
+                           {['500', '700'].map(id => (
                              <div key={id} className="space-y-1">
                                 <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">{id}ml</label>
                                 <input 
                                   type="number"
+                                  step="0.01"
                                   className="w-full p-3 bg-stone-50 rounded-xl outline-none"
-                                  value={settings?.milkshake?.[id] || ''}
-                                  onChange={e => setSettings({...settings, milkshake: {...settings?.milkshake, [id]: parseFloat(e.target.value)}})}
+                                  value={editingSettings?.milkshake?.[id] ?? ''}
+                                  onChange={e => setEditingSettings((prev: any) => ({...prev, milkshake: {...prev?.milkshake, [id]: parseFloat(e.target.value) || 0}}))}
                                 />
                              </div>
                            ))}
@@ -1292,58 +1284,79 @@ export default function App() {
                         
                         <h3 className="font-bold text-stone-800 mb-6 mt-8">Preços de Sundae</h3>
                          <div className="grid grid-cols-2 gap-4">
-                           {['500', '700'].map(id => (
+                           {['300', '400', '500'].map(id => (
                              <div key={id} className="space-y-1">
                                 <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">{id}ml</label>
                                 <input 
                                   type="number"
+                                  step="0.01"
                                   className="w-full p-3 bg-stone-50 rounded-xl outline-none"
-                                  value={settings?.sundae?.[id] || ''}
-                                  onChange={e => setSettings({...settings, sundae: {...settings?.sundae, [id]: parseFloat(e.target.value)}})}
+                                  value={editingSettings?.sundae?.[id] ?? ''}
+                                  onChange={e => setEditingSettings((prev: any) => ({...prev, sundae: {...prev?.sundae, [id]: parseFloat(e.target.value) || 0}}))}
                                 />
                              </div>
                            ))}
                         </div>
 
-                        {/* Gerenciamento de Adicionais por Categoria */}
-                        <h3 className="font-bold text-stone-800 mb-6 mt-10 border-t pt-8">Adicionais por Categoria</h3>
-                        <div className="space-y-6">
-                          {(['acai', 'milkshake', 'sundae'] as const).map(cat => (
-                            <div key={cat}>
-                              <label className="text-xs font-bold text-stone-500 uppercase">{cat === 'acai' ? 'Açaí' : cat === 'milkshake' ? 'Milkshake' : 'Sundae'}</label>
-                              <div className="mt-2 text-sm text-stone-600 bg-stone-50 p-4 rounded-xl">
-                                Selecione os adicionais:
-                                <div className="grid grid-cols-2 gap-2 mt-2">
-                                  {products.filter(p => p.category === 'addon').map(addon => (
-                                    <label key={addon.id} className="flex items-center gap-2">
-                                      <input 
-                                        type="checkbox"
-                                        checked={(settings?.[`${cat}Addons` as keyof AppSettings] as string[] || []).includes(addon.name)}
-                                        onChange={e => {
-                                          const prev = (settings?.[`${cat}Addons` as keyof AppSettings] as string[] || []);
-                                          const next = e.target.checked 
-                                            ? [...prev, addon.name]
-                                            : prev.filter(n => n !== addon.name);
-                                          setSettings({...settings, [`${cat}Addons`]: next});
-                                        }}
-                                      />
-                                      {addon.name}
-                                    </label>
-                                  ))}
-                                </div>
+                        <h3 className="font-bold text-stone-800 mb-6 mt-8">Adicionais Pagos (Açaí)</h3>
+                        <div className="space-y-3">
+                          {(editingSettings?.paidAddons || defaultPaidAddons).map((addon: {name: string, price: number}, idx: number) => (
+                            <div key={idx} className="flex items-center gap-3">
+                              <input 
+                                type="text"
+                                className="flex-1 p-3 bg-stone-50 rounded-xl outline-none font-medium"
+                                value={addon.name}
+                                onChange={e => {
+                                  const updated = [...(editingSettings?.paidAddons || defaultPaidAddons)];
+                                  updated[idx] = { ...updated[idx], name: e.target.value };
+                                  setEditingSettings((prev: any) => ({...prev, paidAddons: updated}));
+                                }}
+                              />
+                              <div className="flex items-center gap-1">
+                                <span className="text-stone-400 text-sm font-bold">R$</span>
+                                <input 
+                                  type="number"
+                                  step="0.01"
+                                  className="w-24 p-3 bg-stone-50 rounded-xl outline-none font-bold"
+                                  value={addon.price}
+                                  onChange={e => {
+                                    const updated = [...(editingSettings?.paidAddons || defaultPaidAddons)];
+                                    updated[idx] = { ...updated[idx], price: parseFloat(e.target.value) || 0 };
+                                    setEditingSettings((prev: any) => ({...prev, paidAddons: updated}));
+                                  }}
+                                />
                               </div>
+                              <button
+                                onClick={() => {
+                                  const updated = [...(editingSettings?.paidAddons || defaultPaidAddons)];
+                                  updated.splice(idx, 1);
+                                  setEditingSettings((prev: any) => ({...prev, paidAddons: updated}));
+                                }}
+                                className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                              >
+                                <Trash2 size={16} />
+                              </button>
                             </div>
                           ))}
+                          <button
+                            onClick={() => {
+                              const updated = [...(editingSettings?.paidAddons || defaultPaidAddons), { name: 'Novo Adicional', price: 5.00 }];
+                              setEditingSettings((prev: any) => ({...prev, paidAddons: updated}));
+                            }}
+                            className="w-full p-3 border-2 border-dashed border-stone-200 rounded-xl text-stone-400 font-bold text-sm hover:border-amarena-red hover:text-amarena-red transition-all"
+                          >
+                            + Adicionar Novo
+                          </button>
                         </div>
                         <button 
                           onClick={async () => {
                             const token = localStorage.getItem('amarena_admin_token');
                             try {
-                              await axios.put('/api/settings', settings, { 
+                              await axios.put('/api/settings', editingSettings, { 
                                 headers: { Authorization: `Bearer ${token}` } 
                               });
+                              setSettings(editingSettings);
                               alert('Configurações salvas com sucesso!');
-                              await fetchSettings(); // Refresh UI
                             } catch (error) {
                               console.error("Save error:", error);
                               alert('Erro ao salvar configurações.');
