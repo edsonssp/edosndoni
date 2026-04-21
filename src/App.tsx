@@ -429,12 +429,12 @@ export default function App() {
   ];
 
   const acaiSizes = [
-    { id: '300', label: '300ml', price: settings?.acai?.['300'] || 25.90, rules: '3 verdes + 1 laranjas', icon: <CupSoda /> },
-    { id: '400', label: '400ml', price: settings?.acai?.['400'] || 30.90, rules: '3 verdes + 1 laranjas', icon: <CupSoda /> },
-    { id: '500', label: '500ml', price: settings?.acai?.['500'] || 36.90, rules: '3 verdes + 1 laranjas', icon: <CupSoda /> },
-    { id: '700', label: '700ml', price: settings?.acai?.['700'] || 44.90, rules: '3 verdes + 1 laranjas', icon: <CupSoda /> },
+    { id: '300', label: '300ml', price: settings?.acai?.['300'] || 19.90, rules: '3 verdes + 1 laranjas', icon: <CupSoda /> },
+    { id: '400', label: '400ml', price: settings?.acai?.['400'] || 24.90, rules: '3 verdes + 1 laranjas', icon: <CupSoda /> },
+    { id: '500', label: '500ml', price: settings?.acai?.['500'] || 29.90, rules: '3 verdes + 1 laranjas', icon: <CupSoda /> },
+    { id: '700', label: '700ml', price: settings?.acai?.['700'] || 36.90, rules: '3 verdes + 1 laranjas', icon: <CupSoda /> },
     { id: 'M500', label: 'M (500ml)', price: settings?.acai?.['M500'] || 39.90, rules: '3 verdes + 2 laranjas', icon: <Soup /> },
-    { id: 'G800', label: 'G (800ml)', price: settings?.acai?.['G800'] || 48.90, rules: '3 verdes + 2 laranjas', icon: <Soup /> },
+    { id: 'G800', label: 'G (800ml)', price: settings?.acai?.['G800'] || 39.90, rules: '3 verdes + 2 laranjas', icon: <Soup /> },
   ];
 
   const acaiOptions = {
@@ -443,12 +443,12 @@ export default function App() {
   };
 
   const defaultPaidAddons = [
-    { name: 'Creme de ninho', price: 5.20 },
-    { name: 'Creme de Pistache', price: 5.78 },
-    { name: 'Kinder Bueno', price: 6.36 },
-    { name: 'Creme de Valsa', price: 5.20 },
-    { name: 'Kit Kat', price: 5.78 },
-    { name: 'Nutella', price: 5.78 }
+    { name: 'Creme de ninho', price: 4.50 },
+    { name: 'Creme de Pistache', price: 5.00 },
+    { name: 'Kinder Bueno', price: 5.50 },
+    { name: 'Creme de Valsa', price: 4.50 },
+    { name: 'Kit Kat', price: 5.00 },
+    { name: 'Nutella', price: 5.00 }
   ];
 
   const paidAddons = (settings?.paidAddons && settings.paidAddons.length > 0)
@@ -456,8 +456,9 @@ export default function App() {
     : defaultPaidAddons;
 
   const milkshakeSizes = [
-    { id: '500', label: '500ml', price: settings?.milkshake?.['500'] || 28.90 },
-    { id: '700', label: '700ml', price: settings?.milkshake?.['700'] || 35.90 },
+    { id: '500', label: '500ml', price: settings?.milkshake?.['200'] || 16.90 },
+    { id: '700', label: '700ml', price: settings?.milkshake?.['400'] || 19.90 },
+    { id: '700', label: '700ml', price: settings?.milkshake?.['500'] || 22.90 },
   ];
 
   const sundaeSizes = [
