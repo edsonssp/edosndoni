@@ -433,7 +433,11 @@ export default function App() {
     { id: '400', label: '400ml', price: settings?.acai?.['400'] || 24.90, rules: '3 verdes + 1 laranjas', icon: <CupSoda /> },
     { id: '500', label: '500ml', price: settings?.acai?.['500'] || 29.90, rules: '3 verdes + 1 laranjas', icon: <CupSoda /> },
     { id: '700', label: '700ml', price: settings?.acai?.['700'] || 36.90, rules: '3 verdes + 1 laranjas', icon: <CupSoda /> },
+<<<<<<< HEAD
     { id: 'M500', label: 'M (500ml)', price: settings?.acai?.['M500'] || 32.90, rules: '3 verdes + 2 laranjas', icon: <Soup /> },
+=======
+    { id: 'M500', label: 'M (500ml)', price: settings?.acai?.['M500'] || 39.90, rules: '3 verdes + 2 laranjas', icon: <Soup /> },
+>>>>>>> 00446a5562deff1f10142404929526d472ddbca1
     { id: 'G800', label: 'G (800ml)', price: settings?.acai?.['G800'] || 39.90, rules: '3 verdes + 2 laranjas', icon: <Soup /> },
   ];
 
@@ -447,8 +451,13 @@ export default function App() {
     { name: 'Creme de Pistache', price: 5.00 },
     { name: 'Kinder Bueno', price: 5.50 },
     { name: 'Creme de Valsa', price: 4.50 },
+<<<<<<< HEAD
     { name: 'Kit Kat', price: 5.00},
     { name: 'Nutella', price: 5.00}
+=======
+    { name: 'Kit Kat', price: 5.00 },
+    { name: 'Nutella', price: 5.00 }
+>>>>>>> 00446a5562deff1f10142404929526d472ddbca1
   ];
 
   const paidAddons = (settings?.paidAddons && settings.paidAddons.length > 0)
@@ -456,9 +465,15 @@ export default function App() {
     : defaultPaidAddons;
 
   const milkshakeSizes = [
+<<<<<<< HEAD
     { id: '300', label: '200ml', price: settings?.milkshake?.['300'] || 16.90 },
     { id: '400', label: '400ml', price: settings?.milkshake?.['400'] || 19.90 },
     { id: '500', label: '500ml', price: settings?.milkshake?.['500'] || 22.90 },
+=======
+    { id: '500', label: '500ml', price: settings?.milkshake?.['200'] || 16.90 },
+    { id: '700', label: '700ml', price: settings?.milkshake?.['400'] || 19.90 },
+    { id: '700', label: '700ml', price: settings?.milkshake?.['500'] || 22.90 },
+>>>>>>> 00446a5562deff1f10142404929526d472ddbca1
   ];
 
   const sundaeSizes = [
