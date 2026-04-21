@@ -179,7 +179,6 @@ export default function App() {
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [settings, setSettings] = useState<any>(null);
-  const [editingSettings, setEditingSettings] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [adminSection, setAdminSection] = useState<'dashboard' | 'products' | 'orders' | 'addons' | 'settings'>('dashboard');
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(!!localStorage.getItem('amarena_admin_token'));
@@ -1115,7 +1114,7 @@ export default function App() {
                   <span className="font-semibold">Adicionais</span>
                 </button>
                 <button 
-                  onClick={() => { setAdminSection('settings'); setEditingSettings(JSON.parse(JSON.stringify(settings || {}))); }}
+                  onClick={() => setAdminSection('settings')}
                   className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${adminSection === 'settings' ? 'bg-amarena-red text-white shadow-md shadow-amarena-red/20' : 'text-stone-500 hover:bg-stone-50'}`}
                 >
                   <Sliders size={20} />
@@ -1257,10 +1256,9 @@ export default function App() {
                                 <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">{id}ml / {id === 'M500' ? 'M' : id === 'G800' ? 'G' : ''}</label>
                                 <input 
                                   type="number"
-                                  step="0.01"
                                   className="w-full p-3 bg-stone-50 rounded-xl outline-none"
-                                  value={editingSettings?.acai?.[id] ?? ''}
-                                  onChange={e => setEditingSettings((prev: any) => ({...prev, acai: {...prev?.acai, [id]: parseFloat(e.target.value) || 0}}))}
+                                  value={settings?.acai?.[id] || ''}
+                                  onChange={e => setSettings({...settings, acai: {...settings?.acai, [id]: parseFloat(e.target.value)}})}
                                 />
                              </div>
                            ))}
@@ -1273,10 +1271,9 @@ export default function App() {
                                 <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">{id}ml</label>
                                 <input 
                                   type="number"
-                                  step="0.01"
                                   className="w-full p-3 bg-stone-50 rounded-xl outline-none"
-                                  value={editingSettings?.milkshake?.[id] ?? ''}
-                                  onChange={e => setEditingSettings((prev: any) => ({...prev, milkshake: {...prev?.milkshake, [id]: parseFloat(e.target.value) || 0}}))}
+                                  value={settings?.milkshake?.[id] || ''}
+                                  onChange={e => setSettings({...settings, milkshake: {...settings?.milkshake, [id]: parseFloat(e.target.value)}})}
                                 />
                              </div>
                            ))}
@@ -1289,10 +1286,9 @@ export default function App() {
                                 <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">{id}ml</label>
                                 <input 
                                   type="number"
-                                  step="0.01"
                                   className="w-full p-3 bg-stone-50 rounded-xl outline-none"
-                                  value={editingSettings?.sundae?.[id] ?? ''}
-                                  onChange={e => setEditingSettings((prev: any) => ({...prev, sundae: {...prev?.sundae, [id]: parseFloat(e.target.value) || 0}}))}
+                                  value={settings?.sundae?.[id] || ''}
+                                  onChange={e => setSettings({...settings, sundae: {...settings?.sundae, [id]: parseFloat(e.target.value)}})}
                                 />
                              </div>
                            ))}
@@ -1300,16 +1296,16 @@ export default function App() {
 
                         <h3 className="font-bold text-stone-800 mb-6 mt-8">Adicionais Pagos (Açaí)</h3>
                         <div className="space-y-3">
-                          {(editingSettings?.paidAddons || defaultPaidAddons).map((addon: {name: string, price: number}, idx: number) => (
+                          {(settings?.paidAddons || defaultPaidAddons).map((addon: {name: string, price: number}, idx: number) => (
                             <div key={idx} className="flex items-center gap-3">
                               <input 
                                 type="text"
                                 className="flex-1 p-3 bg-stone-50 rounded-xl outline-none font-medium"
                                 value={addon.name}
                                 onChange={e => {
-                                  const updated = [...(editingSettings?.paidAddons || defaultPaidAddons)];
+                                  const updated = [...(settings?.paidAddons || defaultPaidAddons)];
                                   updated[idx] = { ...updated[idx], name: e.target.value };
-                                  setEditingSettings((prev: any) => ({...prev, paidAddons: updated}));
+                                  setSettings({...settings, paidAddons: updated});
                                 }}
                               />
                               <div className="flex items-center gap-1">
@@ -1320,17 +1316,17 @@ export default function App() {
                                   className="w-24 p-3 bg-stone-50 rounded-xl outline-none font-bold"
                                   value={addon.price}
                                   onChange={e => {
-                                    const updated = [...(editingSettings?.paidAddons || defaultPaidAddons)];
+                                    const updated = [...(settings?.paidAddons || defaultPaidAddons)];
                                     updated[idx] = { ...updated[idx], price: parseFloat(e.target.value) || 0 };
-                                    setEditingSettings((prev: any) => ({...prev, paidAddons: updated}));
+                                    setSettings({...settings, paidAddons: updated});
                                   }}
                                 />
                               </div>
                               <button
                                 onClick={() => {
-                                  const updated = [...(editingSettings?.paidAddons || defaultPaidAddons)];
+                                  const updated = [...(settings?.paidAddons || defaultPaidAddons)];
                                   updated.splice(idx, 1);
-                                  setEditingSettings((prev: any) => ({...prev, paidAddons: updated}));
+                                  setSettings({...settings, paidAddons: updated});
                                 }}
                                 className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                               >
@@ -1340,8 +1336,8 @@ export default function App() {
                           ))}
                           <button
                             onClick={() => {
-                              const updated = [...(editingSettings?.paidAddons || defaultPaidAddons), { name: 'Novo Adicional', price: 5.00 }];
-                              setEditingSettings((prev: any) => ({...prev, paidAddons: updated}));
+                              const updated = [...(settings?.paidAddons || defaultPaidAddons), { name: 'Novo Adicional', price: 5.00 }];
+                              setSettings({...settings, paidAddons: updated});
                             }}
                             className="w-full p-3 border-2 border-dashed border-stone-200 rounded-xl text-stone-400 font-bold text-sm hover:border-amarena-red hover:text-amarena-red transition-all"
                           >
@@ -1352,11 +1348,11 @@ export default function App() {
                           onClick={async () => {
                             const token = localStorage.getItem('amarena_admin_token');
                             try {
-                              await axios.put('/api/settings', editingSettings, { 
+                              await axios.put('/api/settings', settings, { 
                                 headers: { Authorization: `Bearer ${token}` } 
                               });
-                              setSettings(editingSettings);
                               alert('Configurações salvas com sucesso!');
+                              await fetchSettings(); // Refresh UI
                             } catch (error) {
                               console.error("Save error:", error);
                               alert('Erro ao salvar configurações.');
