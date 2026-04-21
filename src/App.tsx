@@ -179,6 +179,7 @@ export default function App() {
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [settings, setSettings] = useState<any>(null);
+  const [editingSettings, setEditingSettings] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [adminSection, setAdminSection] = useState<'dashboard' | 'products' | 'orders' | 'addons' | 'settings'>('dashboard');
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(!!localStorage.getItem('amarena_admin_token'));
@@ -429,16 +430,12 @@ export default function App() {
   ];
 
   const acaiSizes = [
-    { id: '300', label: '300ml', price: settings?.acai?.['300'] || 19.90, rules: '3 verdes + 1 laranjas', icon: <CupSoda /> },
-    { id: '400', label: '400ml', price: settings?.acai?.['400'] || 24.90, rules: '3 verdes + 1 laranjas', icon: <CupSoda /> },
-    { id: '500', label: '500ml', price: settings?.acai?.['500'] || 29.90, rules: '3 verdes + 1 laranjas', icon: <CupSoda /> },
-    { id: '700', label: '700ml', price: settings?.acai?.['700'] || 36.90, rules: '3 verdes + 1 laranjas', icon: <CupSoda /> },
-<<<<<<< HEAD
-    { id: 'M500', label: 'M (500ml)', price: settings?.acai?.['M500'] || 32.90, rules: '3 verdes + 2 laranjas', icon: <Soup /> },
-=======
+    { id: '300', label: '300ml', price: settings?.acai?.['300'] || 25.90, rules: '3 verdes + 1 laranjas', icon: <CupSoda /> },
+    { id: '400', label: '400ml', price: settings?.acai?.['400'] || 30.90, rules: '3 verdes + 1 laranjas', icon: <CupSoda /> },
+    { id: '500', label: '500ml', price: settings?.acai?.['500'] || 36.90, rules: '3 verdes + 1 laranjas', icon: <CupSoda /> },
+    { id: '700', label: '700ml', price: settings?.acai?.['700'] || 44.90, rules: '3 verdes + 1 laranjas', icon: <CupSoda /> },
     { id: 'M500', label: 'M (500ml)', price: settings?.acai?.['M500'] || 39.90, rules: '3 verdes + 2 laranjas', icon: <Soup /> },
->>>>>>> 00446a5562deff1f10142404929526d472ddbca1
-    { id: 'G800', label: 'G (800ml)', price: settings?.acai?.['G800'] || 39.90, rules: '3 verdes + 2 laranjas', icon: <Soup /> },
+    { id: 'G800', label: 'G (800ml)', price: settings?.acai?.['G800'] || 48.90, rules: '3 verdes + 2 laranjas', icon: <Soup /> },
   ];
 
   const acaiOptions = {
@@ -447,17 +444,12 @@ export default function App() {
   };
 
   const defaultPaidAddons = [
-    { name: 'Creme de ninho', price: 4.50 },
-    { name: 'Creme de Pistache', price: 5.00 },
-    { name: 'Kinder Bueno', price: 5.50 },
-    { name: 'Creme de Valsa', price: 4.50 },
-<<<<<<< HEAD
-    { name: 'Kit Kat', price: 5.00},
-    { name: 'Nutella', price: 5.00}
-=======
-    { name: 'Kit Kat', price: 5.00 },
-    { name: 'Nutella', price: 5.00 }
->>>>>>> 00446a5562deff1f10142404929526d472ddbca1
+    { name: 'Creme de ninho', price: 5.20 },
+    { name: 'Creme de Pistache', price: 5.78 },
+    { name: 'Kinder Bueno', price: 6.36 },
+    { name: 'Creme de Valsa', price: 5.20 },
+    { name: 'Kit Kat', price: 5.78 },
+    { name: 'Nutella', price: 5.78 }
   ];
 
   const paidAddons = (settings?.paidAddons && settings.paidAddons.length > 0)
@@ -465,15 +457,8 @@ export default function App() {
     : defaultPaidAddons;
 
   const milkshakeSizes = [
-<<<<<<< HEAD
-    { id: '300', label: '200ml', price: settings?.milkshake?.['300'] || 16.90 },
-    { id: '400', label: '400ml', price: settings?.milkshake?.['400'] || 19.90 },
-    { id: '500', label: '500ml', price: settings?.milkshake?.['500'] || 22.90 },
-=======
-    { id: '500', label: '500ml', price: settings?.milkshake?.['200'] || 16.90 },
-    { id: '700', label: '700ml', price: settings?.milkshake?.['400'] || 19.90 },
-    { id: '700', label: '700ml', price: settings?.milkshake?.['500'] || 22.90 },
->>>>>>> 00446a5562deff1f10142404929526d472ddbca1
+    { id: '500', label: '500ml', price: settings?.milkshake?.['500'] || 28.90 },
+    { id: '700', label: '700ml', price: settings?.milkshake?.['700'] || 35.90 },
   ];
 
   const sundaeSizes = [
@@ -1130,7 +1115,7 @@ export default function App() {
                   <span className="font-semibold">Adicionais</span>
                 </button>
                 <button 
-                  onClick={() => setAdminSection('settings')}
+                  onClick={() => { setAdminSection('settings'); setEditingSettings(JSON.parse(JSON.stringify(settings || {}))); }}
                   className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${adminSection === 'settings' ? 'bg-amarena-red text-white shadow-md shadow-amarena-red/20' : 'text-stone-500 hover:bg-stone-50'}`}
                 >
                   <Sliders size={20} />
@@ -1272,9 +1257,10 @@ export default function App() {
                                 <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">{id}ml / {id === 'M500' ? 'M' : id === 'G800' ? 'G' : ''}</label>
                                 <input 
                                   type="number"
+                                  step="0.01"
                                   className="w-full p-3 bg-stone-50 rounded-xl outline-none"
-                                  value={settings?.acai?.[id] || ''}
-                                  onChange={e => setSettings({...settings, acai: {...settings?.acai, [id]: parseFloat(e.target.value)}})}
+                                  value={editingSettings?.acai?.[id] ?? ''}
+                                  onChange={e => setEditingSettings((prev: any) => ({...prev, acai: {...prev?.acai, [id]: parseFloat(e.target.value) || 0}}))}
                                 />
                              </div>
                            ))}
@@ -1287,9 +1273,10 @@ export default function App() {
                                 <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">{id}ml</label>
                                 <input 
                                   type="number"
+                                  step="0.01"
                                   className="w-full p-3 bg-stone-50 rounded-xl outline-none"
-                                  value={settings?.milkshake?.[id] || ''}
-                                  onChange={e => setSettings({...settings, milkshake: {...settings?.milkshake, [id]: parseFloat(e.target.value)}})}
+                                  value={editingSettings?.milkshake?.[id] ?? ''}
+                                  onChange={e => setEditingSettings((prev: any) => ({...prev, milkshake: {...prev?.milkshake, [id]: parseFloat(e.target.value) || 0}}))}
                                 />
                              </div>
                            ))}
@@ -1302,9 +1289,10 @@ export default function App() {
                                 <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">{id}ml</label>
                                 <input 
                                   type="number"
+                                  step="0.01"
                                   className="w-full p-3 bg-stone-50 rounded-xl outline-none"
-                                  value={settings?.sundae?.[id] || ''}
-                                  onChange={e => setSettings({...settings, sundae: {...settings?.sundae, [id]: parseFloat(e.target.value)}})}
+                                  value={editingSettings?.sundae?.[id] ?? ''}
+                                  onChange={e => setEditingSettings((prev: any) => ({...prev, sundae: {...prev?.sundae, [id]: parseFloat(e.target.value) || 0}}))}
                                 />
                              </div>
                            ))}
@@ -1312,16 +1300,16 @@ export default function App() {
 
                         <h3 className="font-bold text-stone-800 mb-6 mt-8">Adicionais Pagos (Açaí)</h3>
                         <div className="space-y-3">
-                          {(settings?.paidAddons || defaultPaidAddons).map((addon: {name: string, price: number}, idx: number) => (
+                          {(editingSettings?.paidAddons || defaultPaidAddons).map((addon: {name: string, price: number}, idx: number) => (
                             <div key={idx} className="flex items-center gap-3">
                               <input 
                                 type="text"
                                 className="flex-1 p-3 bg-stone-50 rounded-xl outline-none font-medium"
                                 value={addon.name}
                                 onChange={e => {
-                                  const updated = [...(settings?.paidAddons || defaultPaidAddons)];
+                                  const updated = [...(editingSettings?.paidAddons || defaultPaidAddons)];
                                   updated[idx] = { ...updated[idx], name: e.target.value };
-                                  setSettings({...settings, paidAddons: updated});
+                                  setEditingSettings((prev: any) => ({...prev, paidAddons: updated}));
                                 }}
                               />
                               <div className="flex items-center gap-1">
@@ -1332,17 +1320,17 @@ export default function App() {
                                   className="w-24 p-3 bg-stone-50 rounded-xl outline-none font-bold"
                                   value={addon.price}
                                   onChange={e => {
-                                    const updated = [...(settings?.paidAddons || defaultPaidAddons)];
+                                    const updated = [...(editingSettings?.paidAddons || defaultPaidAddons)];
                                     updated[idx] = { ...updated[idx], price: parseFloat(e.target.value) || 0 };
-                                    setSettings({...settings, paidAddons: updated});
+                                    setEditingSettings((prev: any) => ({...prev, paidAddons: updated}));
                                   }}
                                 />
                               </div>
                               <button
                                 onClick={() => {
-                                  const updated = [...(settings?.paidAddons || defaultPaidAddons)];
+                                  const updated = [...(editingSettings?.paidAddons || defaultPaidAddons)];
                                   updated.splice(idx, 1);
-                                  setSettings({...settings, paidAddons: updated});
+                                  setEditingSettings((prev: any) => ({...prev, paidAddons: updated}));
                                 }}
                                 className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                               >
@@ -1352,8 +1340,8 @@ export default function App() {
                           ))}
                           <button
                             onClick={() => {
-                              const updated = [...(settings?.paidAddons || defaultPaidAddons), { name: 'Novo Adicional', price: 5.00 }];
-                              setSettings({...settings, paidAddons: updated});
+                              const updated = [...(editingSettings?.paidAddons || defaultPaidAddons), { name: 'Novo Adicional', price: 5.00 }];
+                              setEditingSettings((prev: any) => ({...prev, paidAddons: updated}));
                             }}
                             className="w-full p-3 border-2 border-dashed border-stone-200 rounded-xl text-stone-400 font-bold text-sm hover:border-amarena-red hover:text-amarena-red transition-all"
                           >
@@ -1364,11 +1352,11 @@ export default function App() {
                           onClick={async () => {
                             const token = localStorage.getItem('amarena_admin_token');
                             try {
-                              await axios.put('/api/settings', settings, { 
+                              await axios.put('/api/settings', editingSettings, { 
                                 headers: { Authorization: `Bearer ${token}` } 
                               });
+                              setSettings(editingSettings);
                               alert('Configurações salvas com sucesso!');
-                              await fetchSettings(); // Refresh UI
                             } catch (error) {
                               console.error("Save error:", error);
                               alert('Erro ao salvar configurações.');
